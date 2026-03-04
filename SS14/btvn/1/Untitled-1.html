@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Quản lý sản phẩm</title>
+</head>
+<body>
+
+<h2>Quản lý sản phẩm</h2>
+
+<form id="product-form">
+    <input type="text" id="product-name" placeholder="Tên sản phẩm">
+    <input type="number" id="product-price" placeholder="Giá sản phẩm">
+    <button type="submit">Thêm sản phẩm</button>
+</form>
+
+<br>
+
+<input type="text" id="search-input" placeholder="Tìm sản phẩm theo tên">
+
+<br><br>
+
+<button id="sort-asc">Sắp xếp tăng dần</button>
+<button id="sort-desc">Sắp xếp giảm dần</button>
+
+<ul id="product-list"></ul>
+
+<script>
+    let products = [
+        { id: 1, name: "Bánh Chưng", price: 150000 },
+        { id: 2, name: "Giò Lụa", price: 180000 },
+        { id: 3, name: "Cành Đào", price: 500000 }
+    ];
+
+    const productList = document.getElementById("product-list");
+    const productForm = document.getElementById("product-form");
+    const nameInput = document.getElementById("product-name");
+    const priceInput = document.getElementById("product-price");
+    const searchInput = document.getElementById("search-input");
+    const sortAscBtn = document.getElementById("sort-asc");
+    const sortDescBtn = document.getElementById("sort-desc");
+
+    function formatPrice(price) {
+        return Number(price).toLocaleString("vi-VN") + " VND";
+    }
+
+    function renderAll(list) {
+        productList.innerHTML = "";
+
+        list.forEach(function(product) {
+            const li = document.createElement("li");
+
+            li.innerHTML = `
+                <strong>${product.name}</strong> - 
+                <span>${formatPrice(product.price)}</span>
+                <button class="edit-btn" data-id="${product.id}">Sửa giá</button>
+                <button class="delete-btn" data-id="${product.id}">Xóa</button>
+            `;
+
+            productList.appendChild(li);
+        });
+    }
+
+    renderAll(products);
+
+    productForm.addEventListener("submit", function(e) {
+        e.preventDefault();
+
+        const name = nameInput.value.trim();
+        const price = priceInput.value.trim();
+
+        if (!name || !price || isNaN(price) || Number(price) <= 0) {
+            alert("Dữ liệu không hợp lệ");
+            return;
+        }
+
+        const newProduct = {
+            id: Date.now(),
+            name: name,
+            price: Number(price)
+        };
+
+        products.push(newProduct);
+        renderAll(products);
+
+        nameInput.value = "";
+        priceInput.value = "";
+    });
+
+    productList.addEventListener("click", function(e) {
+        const id = Number(e.target.dataset.id);
+
+        if (e.target.classList.contains("delete-btn")) {
+            const confirmDelete = confirm("Bạn có chắc muốn xóa?");
+            if (!confirmDelete) return;
+
+            products = products.filter(function(p) {
+                return p.id !== id;
+            });
+
+            renderAll(products);
+        }
+
+        if (e.target.classList.contains("edit-btn")) {
+            const newPrice = prompt("Nhập giá mới (VND):");
+            if (newPrice === null) return;
+
+            if (isNaN(newPrice) || newPrice.trim() === "" || Number(newPrice) <= 0) {
+                alert("Giá không hợp lệ");
+                return;
+            }
+
+            products = products.map(function(p) {
+                if (p.id === id) {
+                    return { ...p, price: Number(newPrice) };
+                }
+                return p;
+            });
+
+            renderAll(products);
+        }
+    });
+
+    searchInput.addEventListener("input", function() {
+        const keyword = searchInput.value.toLowerCase();
+
+        const filtered = products.filter(function(p) {
+            return p.name.toLowerCase().includes(keyword);
+        });
+
+        renderAll(filtered);
+    });
+
+    sortAscBtn.addEventListener("click", function() {
+        const sorted = [...products].sort(function(a, b) {
+            return a.price - b.price;
+        });
+        renderAll(sorted);
+    });
+
+    sortDescBtn.addEventListener("click", function() {
+        const sorted = [...products].sort(function(a, b) {
+            return b.price - a.price;
+        });
+        renderAll(sorted);
+    });
+
+</script>
+
+</body>
+</html>
