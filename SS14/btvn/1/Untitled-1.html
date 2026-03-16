@@ -1,151 +1,174 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Quản lý sản phẩm</title>
+<meta charset="UTF-8">
+<title>Student Manager</title>
 </head>
+
 <body>
-
-<h2>Quản lý sản phẩm</h2>
-
-<form id="product-form">
-    <input type="text" id="product-name" placeholder="Tên sản phẩm">
-    <input type="number" id="product-price" placeholder="Giá sản phẩm">
-    <button type="submit">Thêm sản phẩm</button>
-</form>
-
-<br>
-
-<input type="text" id="search-input" placeholder="Tìm sản phẩm theo tên">
-
-<br><br>
-
-<button id="sort-asc">Sắp xếp tăng dần</button>
-<button id="sort-desc">Sắp xếp giảm dần</button>
-
-<ul id="product-list"></ul>
-
 <script>
-    let products = [
-        { id: 1, name: "Bánh Chưng", price: 150000 },
-        { id: 2, name: "Giò Lụa", price: 180000 },
-        { id: 3, name: "Cành Đào", price: 500000 }
-    ];
 
-    const productList = document.getElementById("product-list");
-    const productForm = document.getElementById("product-form");
-    const nameInput = document.getElementById("product-name");
-    const priceInput = document.getElementById("product-price");
-    const searchInput = document.getElementById("search-input");
-    const sortAscBtn = document.getElementById("sort-asc");
-    const sortDescBtn = document.getElementById("sort-desc");
+let students = [
+ {id:"S01",name:"Nguyen Van A",age:19,gpa:8.9,status:"active"},
+ {id:"S02",name:"Tran Thi B",age:18,gpa:7.5,status:"active"},
+ {id:"S03",name:"Le Van C",age:21,gpa:6.2,status:"active"},
+ {id:"S04",name:"Pham Thi D",age:20,gpa:5.0,status:"inactive"},
+ {id:"S05",name:"Hoang Van E",age:22,gpa:2.8,status:"active"}
+];
 
-    function formatPrice(price) {
-        return Number(price).toLocaleString("vi-VN") + " VND";
-    }
+function showStudents(){
+ console.log("Danh sach sinh vien:");
+ for(let i=0;i<students.length;i++){
+  console.log(
+   students[i].id,
+   students[i].name,
+   students[i].age,
+   students[i].gpa,
+   students[i].status
+  );
+ }
+}
 
-    function renderAll(list) {
-        productList.innerHTML = "";
+function createStudent(){
 
-        list.forEach(function(product) {
-            const li = document.createElement("li");
+ let id = prompt("Nhap id");
+ let name = prompt("Nhap ten");
+ let age = Number(prompt("Nhap tuoi"));
+ let gpa = Number(prompt("Nhap gpa"));
+ let status = prompt("Nhap status");
 
-            li.innerHTML = `
-                <strong>${product.name}</strong> - 
-                <span>${formatPrice(product.price)}</span>
-                <button class="edit-btn" data-id="${product.id}">Sửa giá</button>
-                <button class="delete-btn" data-id="${product.id}">Xóa</button>
-            `;
+ let st = {
+  id:id,
+  name:name,
+  age:age,
+  gpa:gpa,
+  status:status
+ };
 
-            productList.appendChild(li);
-        });
-    }
+ students.push(st);
 
-    renderAll(products);
+ alert("Them thanh cong");
+}
 
-    productForm.addEventListener("submit", function(e) {
-        e.preventDefault();
+function updateStudent(){
 
-        const name = nameInput.value.trim();
-        const price = priceInput.value.trim();
+ let id = prompt("Nhap id can sua");
 
-        if (!name || !price || isNaN(price) || Number(price) <= 0) {
-            alert("Dữ liệu không hợp lệ");
-            return;
-        }
+ for(let i=0;i<students.length;i++){
 
-        const newProduct = {
-            id: Date.now(),
-            name: name,
-            price: Number(price)
-        };
+  if(students[i].id == id){
 
-        products.push(newProduct);
-        renderAll(products);
+   let name = prompt("Nhap ten moi");
+   let age = prompt("Nhap tuoi moi");
+   let gpa = prompt("Nhap gpa moi");
+   let status = prompt("Nhap status moi");
 
-        nameInput.value = "";
-        priceInput.value = "";
-    });
+   if(name!="") students[i].name = name;
+   if(age!="") students[i].age = age;
+   if(gpa!="") students[i].gpa = gpa;
+   if(status!="") students[i].status = status;
 
-    productList.addEventListener("click", function(e) {
-        const id = Number(e.target.dataset.id);
+   alert("Cap nhat thanh cong");
+   return;
+  }
 
-        if (e.target.classList.contains("delete-btn")) {
-            const confirmDelete = confirm("Bạn có chắc muốn xóa?");
-            if (!confirmDelete) return;
+ }
 
-            products = products.filter(function(p) {
-                return p.id !== id;
-            });
+ alert("Khong tim thay sinh vien");
+}
 
-            renderAll(products);
-        }
+function deleteStudent(){
 
-        if (e.target.classList.contains("edit-btn")) {
-            const newPrice = prompt("Nhập giá mới (VND):");
-            if (newPrice === null) return;
+ let id = prompt("Nhap id can xoa");
 
-            if (isNaN(newPrice) || newPrice.trim() === "" || Number(newPrice) <= 0) {
-                alert("Giá không hợp lệ");
-                return;
-            }
+ for(let i=0;i<students.length;i++){
 
-            products = products.map(function(p) {
-                if (p.id === id) {
-                    return { ...p, price: Number(newPrice) };
-                }
-                return p;
-            });
+  if(students[i].id == id){
 
-            renderAll(products);
-        }
-    });
+   students[i].status = "inactive";
 
-    searchInput.addEventListener("input", function() {
-        const keyword = searchInput.value.toLowerCase();
+   alert("Da soft delete");
+   return;
+  }
 
-        const filtered = products.filter(function(p) {
-            return p.name.toLowerCase().includes(keyword);
-        });
+ }
 
-        renderAll(filtered);
-    });
+ alert("Khong tim thay");
+}
 
-    sortAscBtn.addEventListener("click", function() {
-        const sorted = [...products].sort(function(a, b) {
-            return a.price - b.price;
-        });
-        renderAll(sorted);
-    });
+function analytics(){
 
-    sortDescBtn.addEventListener("click", function() {
-        const sorted = [...products].sort(function(a, b) {
-            return b.price - a.price;
-        });
-        renderAll(sorted);
-    });
+ let total = students.length;
+ let active = 0;
+ let inactive = 0;
+ let sum = 0;
+
+ for(let i=0;i<students.length;i++){
+
+  sum += students[i].gpa;
+
+  if(students[i].status == "active"){
+   active++;
+  }else{
+   inactive++;
+  }
+
+ }
+
+ let avg = sum/total;
+
+ console.log("Tong sinh vien:",total);
+ console.log("Active:",active);
+ console.log("Inactive:",inactive);
+ console.log("GPA trung binh:",avg);
+}
+
+function menu(){
+
+ let choice;
+
+ do{
+
+ choice = prompt(
+`
+1. Them sinh vien
+2. Cap nhat
+3. Soft delete
+4. Xem danh sach
+5. Thong ke
+0. Thoat
+`);
+
+ switch(choice){
+
+  case "1":
+   createStudent();
+   break;
+
+  case "2":
+   updateStudent();
+   break;
+
+  case "3":
+   deleteStudent();
+   break;
+
+  case "4":
+   showStudents();
+   break;
+
+  case "5":
+   analytics();
+   break;
+
+ }
+
+ }while(choice!="0");
+
+}
+
+menu();
 
 </script>
-
 </body>
 </html>
